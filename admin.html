@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>SmartLink — Quản Lý</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/main.css">
+</head>
+<body>
+
+<header>
+  <div class="brand">Smart<span>Link</span> Admin</div>
+  <a href="./index.html" class="btn btn-outline">← Trang chủ</a>
+</header>
+
+<div class="container">
+  <div class="card">
+    <h1>📊 Quản lý link</h1>
+    <div class="sub">Theo dõi & quản lý toàn bộ link rút gọn</div>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Slug</th>
+          <th>URL</th>
+          <th>Clicks</th>
+          <th>Hết hạn</th>
+          <th>Trạng thái</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody id="linkTable"></tbody>
+    </table>
+
+    <div style="margin-top:20px">
+      <button class="btn danger-btn" id="clearAllBtn">🗑️ Xoá toàn bộ dữ liệu</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="./assets/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartLink — Professional Link Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/css/main.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+<body>
+<header>
+  <div class="brand">Smart<span>Link</span></div>
+  <div class="badge badge-muted">Professional</div>
+</header>
+<div class="container">
+
+<!-- SOCIAL / ADS BOX -->
+<div class="social-box">
+  <div class="social-header" id="socialToggle">
+    <span>🌐 Kênh Chính Thức • Tiến Nguyễn Shop</span>
+    <span class="arrow">▾</span>
+  </div>
+
+  <div class="social-dropdown" id="socialDropdown">
+    <a href="https://www.tiktok.com/@tiennguyenshop" target="_blank" class="social-btn tiktok">TikTok</a>
+    <a href="https://www.youtube.com/@tiennguyenshop" target="_blank" class="social-btn youtube">YouTube</a>
+    <a href="https://www.facebook.com/tiennguyenshop" target="_blank" class="social-btn facebook">Facebook</a>
+    <a href="https://shopee.vn/tiennguyenshop" target="_blank" class="social-btn shopee">Shopee</a>
+    <a href="https://www.lazada.vn/shop/tiennguyenshop" target="_blank" class="social-btn lazada">Lazada</a>
+  </div>
+</div>
+
+  <div class="grid">
+    <!-- MAIN CREATE FORM -->
+    <div class="card" id="createCard">
+      <h1>Tạo Link Mới</h1>
+      <div class="sub">Quản lý link thông minh — có thời hạn, khoá mật khẩu, theo dõi lượt dùng</div>
+
+<div class="field">
+  <label>Tạo Slug từ Văn Bản Gốc</label>
+  <input id="slugSource" placeholder="Nhập nội dung để tạo slug..." />
+  <div class="hint">Slug sẽ được tạo tự động từ nội dung này</div>
+</div>
+
+      <div class="field">
+        <label>Link gốc</label>
+        <input id="url" placeholder="https://" />
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Slug</label>
+          <input id="slug" placeholder="vd: sp01" />
+        </div>
+        <div class="field">
+          <label>Tiêu đề</label>
+          <input id="title" placeholder="Tiêu đề hiển thị" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Mô tả</label>
+        <textarea id="description"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Thời hạn link</label>
+        <input type="datetime-local" id="expireAt" />
+        <div class="toggle hint">
+          <input type="checkbox" id="forever" />
+          <span>Vĩnh viễn (không hết hạn)</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Bảo mật</label>
+        <div class="toggle">
+          <input type="checkbox" id="lockToggle" />
+          <span>Khoá link bằng mật khẩu</span>
+        </div>
+      </div>
+
+      <div class="field" id="passwordWrap" style="display:none">
+        <label>Mật khẩu</label>
+        <input type="password" id="password" />
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="create">Tạo link</button>
+        <button class="btn btn-outline" type="reset">Làm mới</button>
+      </div>
+      
+      <div class="error" id="error"></div>
+      <!-- LOADING OVERLAY (CHỈ TRONG CARD) -->
+<div id="cardLoading" class="card-loading">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <div class="loading-text">Mình Đang Tạo Link Rút Gọn…</div>
+  </div>
+</div>
+
+    </div>
+
+    <!-- SIDE PANEL -->
+    <div class="side" id="sidePanel">
+      <div class="stat">
+        <!--<div>
+          <div class="hint">Lượt sử dụng</div>
+          <strong id="clicks">0</strong>
+        </div>-->
+        <span class="badge badge-success">Active</span>
+      </div>
+      <div class="stat">
+        <div class="hint">Thời hạn</div>
+        <strong id="expireText">...</strong>
+      </div>
+      <div class="hint">Thông tin sẽ được cập nhật sau khi link được tạo và sử dụng.</div>
+    </div>
+    
+    <!-- RESULT CARD -->
+<div class="card" id="resultCard" style="display:none;margin-top:24px">
+  <h2 style="margin-top:0">🎉 Link đã được tạo</h2>
+
+  <div class="field">
+    <label>Link rút gọn của bạn</label>
+    <textarea id="resultLink" readonly></textarea>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="copyBtn">📋 Copy Link</button>
+    <a class="btn btn-outline" id="visitBtn" target="_blank">🚀 Truy cập</a>
+    <button class="btn btn-outline" id="newLinkBtn" style="margin-top:12px">➕ Tạo Link Rút Gọn Mới</button>
+  </div>
+
+  <!-- THANK YOU BOX -->
+  <div style="
+    margin-top:20px;
+    padding:16px;
+    border-radius:16px;
+    background:linear-gradient(135deg, rgba(79,70,229,.15), rgba(34,211,238,.15));
+    border:1px solid var(--border);
+    font-weight:600;
+    text-align:center;
+  ">
+    💙 Cảm Ơn Bạn Đã Sử Dụng Dịch Vụ Của  
+    <span style="color:var(--accent)">Tiến Nguyễn Shop</span>
+  </div>
+</div>
+ <!-- Kết Thúc Ở Đây -->
+ 
+  </div>
+</div>
+<footer>© 2025 SmartLink • Built on GitHub Pages</footer>
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="./assets/js/main.js"></script>
+</body>
+</html>
