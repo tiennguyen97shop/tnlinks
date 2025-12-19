@@ -1,0 +1,214 @@
+    :root{
+      --bg:#0b1020;--panel:#0f172a;--card:#11162a;--primary:#4f46e5;--accent:#22d3ee;
+      --text:#e5e7eb;--muted:#94a3b8;--border:#1f2937;--success:#22c55e;--danger:#ef4444;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;font-family:Inter,sans-serif;color:var(--text);
+      background:radial-gradient(1200px 600px at 50% -20%,#1e1b4b,transparent),var(--bg);
+      min-height:100vh;
+    }
+    header{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:20px 32px;border-bottom:1px solid var(--border);background:rgba(15,23,42,.7);backdrop-filter:blur(8px);
+      position:sticky;top:0;z-index:10
+    }
+    .brand{font-weight:800;font-size:1.2rem;letter-spacing:.3px}
+    .brand span{color:var(--primary)}
+    .container{max-width:1200px;margin:0 auto;padding:32px}
+    .grid{display:grid;grid-template-columns:2fr 1fr;gap:24px}
+    .card{
+      background:linear-gradient(180deg,rgba(79,70,229,.08),transparent),var(--card);
+      border:1px solid var(--border);border-radius:22px;padding:28px;box-shadow:0 30px 80px rgba(0,0,0,.45)
+    }
+    h1{margin:0 0 6px;font-size:1.9rem}
+    .sub{color:var(--muted);margin-bottom:22px}
+    .field{margin-bottom:16px}
+    label{display:block;font-weight:600;margin-bottom:6px}
+    input,textarea{
+      width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);
+      background:#020617;color:var(--text);font-size:.95rem
+    }
+    textarea{min-height:90px;resize:vertical}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .toggle{display:flex;align-items:center;gap:10px;font-size:.9rem}
+    .toggle input{width:auto}
+    .hint{color:var(--muted);font-size:.8rem;margin-top:6px}
+    .actions{margin-top:20px;display:flex;gap:12px;flex-wrap:wrap}
+    .btn{padding:12px 18px;border-radius:14px;font-weight:600;border:none;cursor:pointer}
+    .btn-primary{background:linear-gradient(135deg,var(--primary),#6366f1);color:#fff}
+    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+    .side{
+      background:var(--panel);border:1px solid var(--border);border-radius:22px;padding:22px
+    }
+    .stat{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .stat strong{font-size:1.4rem}
+    .badge{padding:6px 10px;border-radius:999px;font-size:.75rem;font-weight:600}
+    .badge-success{background:rgba(34,197,94,.15);color:var(--success)}
+    .badge-muted{background:rgba(148,163,184,.15);color:var(--muted)}
+    .preview{margin-top:16px;padding:14px;border:1px dashed var(--border);border-radius:14px;font-size:.9rem}
+    .error{color:var(--danger);margin-top:10px;font-size:.9rem}
+    footer{padding:24px;text-align:center;color:var(--muted);font-size:.8rem}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+    
+    /* CARD PHẢI RELATIVE */
+#createCard{
+  position:relative;
+}
+
+/* OVERLAY TRONG CARD */
+.card-loading{
+  position:absolute;
+  inset:0;
+  background:rgba(2,6,23,.75);
+  backdrop-filter:blur(4px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:20;
+  border-radius:22px;
+}
+
+/* BOX */
+.loading-box{
+  background:#020617;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:22px 28px;
+  text-align:center;
+  box-shadow:0 30px 60px rgba(0,0,0,.55);
+}
+
+.loading-text{
+  margin-top:12px;
+  font-weight:600;
+  color:var(--accent);
+  font-size:.95rem;
+}
+
+/* SPINNER */
+.spinner{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:4px solid rgba(255,255,255,.15);
+  border-top-color:var(--primary);
+  animation:spin 1s linear infinite;
+  margin:auto;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+
+#visitBtn {
+  text-decoration:none;
+  display:inline-block;
+}
+
+/* Admin /*
+
+
+/* Di Chuyển */
+
+.center{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+}
+
+.redirect-card{
+  max-width:420px;
+  text-align:center;
+  padding:32px;
+}
+
+.center-brand{
+  font-weight:800;
+  font-size:1.4rem;
+  margin-bottom:20px;
+}
+
+.spinner{
+  width:44px;
+  height:44px;
+  border:4px solid #1f2937;
+  border-top-color:var(--primary);
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+  margin:0 auto 16px;
+}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.countdown{
+  margin:16px 0;
+  font-size:.95rem;
+  color:var(--muted);
+}
+
+.redirect-footer{
+  margin-top:26px;
+  font-size:.75rem;
+  color:var(--muted);
+}
+
+.redirect-card input{
+  margin:12px 0;
+}
+
+/* SOCIAL BOX */
+.social-box {
+  margin: 20px 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(79,70,229,.08), rgba(34,211,238,.08));
+  overflow: hidden;
+}
+
+/* HEADER */
+.social-header {
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 600;
+  user-select: none;
+}
+
+.social-header .arrow {
+  transition: transform .3s ease;
+}
+
+/* DROPDOWN */
+.social-dropdown {
+  display: none;
+  padding: 16px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* BUTTON CHUNG */
+.social-btn {
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: .85rem;
+  color: #fff;
+  text-decoration: none;
+  transition: transform .2s ease, opacity .2s ease;
+}
+
+.social-btn:hover {
+  transform: translateY(-2px);
+  opacity: .9;
+}
+
+/* MÀU THEO NỀN TẢNG */
+.tiktok { background: #000; }
+.youtube { background: #ff0000; }
+.facebook { background: #1877f2; }
+.shopee { background: #ee4d2d; }
+.lazada { background: #1a2bff; }
