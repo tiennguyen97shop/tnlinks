@@ -1,6 +1,10 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycby84cmQIndmZpV6WIQrU6Gf1OlHujkJbskazkHETy9piDK8bilci1wANQ5Ecel3WSlx7w/exec';
 
-const slug = location.pathname.split('/').filter(Boolean).pop();
+// Lấy slug từ cuối URL
+// Ví dụ: https://tiennguyen.github.io/tnlinks/go/abc123
+const pathParts = location.pathname.split('/').filter(Boolean);
+const goIndex = pathParts.indexOf('go'); // tìm vị trí 'go'
+const slug = goIndex >= 0 && goIndex < pathParts.length-1 ? pathParts[goIndex+1] : '';
 
 const loadingBox = document.getElementById('loadingBox');
 const infoBox    = document.getElementById('infoBox');
