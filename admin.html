@@ -1,45 +1,406 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>SmartLink — Quản Lý</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/css/main.css">
-</head>
-<body>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard – SmartLink</title>
 
+<!-- Main CSS gốc -->
+<link rel="stylesheet" href="./assets/css/main.css">
+
+<!-- Toastify -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+<style>
+/* ===== Variables (main.css gốc) ===== */
+:root {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --card: #fff;
+  --border: #e5e7eb;
+  --muted: #6b7280;
+  --text: #111827;
+  --background: #f9fafb;
+}
+
+/* ===== Body & container ===== */
+/*body {
+  font-family: 'Inter', sans-serif;
+  background: var(--background);
+  margin: 0;
+  padding: 0;
+}*/
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* ===== Header ===== */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+header .brand {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--primary);
+}
+
+header .brand span {
+  color: var(--text);
+}
+
+header .badge-muted {
+  background: var(--border);
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* ===== Login Card ===== */
+#loginCard {
+  max-width: 380px;
+  margin: 60px auto;
+  padding: 32px;
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  text-align: center;
+}
+
+#loginCard h2 {
+  margin-bottom: 24px;
+}
+
+#adminKey {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+  font-size: 1rem;
+}
+
+.login-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.login-btn {
+  width: 60%;
+  max-width: 260px;
+  padding: 14px 0;
+  font-size: 1rem;
+  border-radius: 14px;
+  border: none;
+  background-color: var(--primary);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: 0.2s;
+}
+
+.login-btn:hover {
+  background-color: var(--primary-hover);
+}
+
+.login-btn.loading {
+  pointer-events: none;
+}
+
+.login-btn .spinner {
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top: 3px solid #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: spin 1s linear infinite;
+  margin-left: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== Dashboard ===== */
+#dashboard {
+  display: none;
+}
+
+/* ===== Admin Header ===== */
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.admin-header h1 {
+  font-size: 1.5rem;
+  color: var(--text);
+}
+
+.top-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.top-actions .btn {
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.top-actions .btn:hover {
+  background: var(--primary-hover);
+  color: #fff;
+}
+
+/* ===== Stats Boxes ===== */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.stat-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+
+.stat-box:hover {
+  transform: translateY(-2px);
+}
+
+.stat-box h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--text);
+}
+
+.stat-box span {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* ===== Table ===== */
+.table-wrap {
+  margin-top: 24px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 600px;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* ===== Badges ===== */
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.badge-open { background: rgba(34,197,94,.15); color: #22c55e; }
+.badge-locked { background: rgba(234,179,8,.15); color: #eab308; }
+.badge-expired { background: rgba(239,68,68,.15); color: #ef4444; }
+.badge-forever { background: rgba(79,70,229,.15); color: #6366f1; }
+
+/* ===== Action Buttons ===== */
+.action-btn {
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #ef4444;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: 0.2s;
+}
+
+.action-btn:hover {
+  background: #dc2626;
+}
+
+/* ===== Loading Overlay ===== */
+#loadingOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.2);
+  backdrop-filter: blur(2px);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+#loadingOverlay .spinner {
+  border: 4px solid rgba(255,255,255,0.3);
+  border-top: 4px solid #fff;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  animation: spin 1s linear infinite;
+}
+
+/* Pagination */
+#pagination{margin-top:12px;text-align:center}
+#pagination button{padding:6px 12px;margin:0 4px;border-radius:8px;border:1px solid #ccc;background:#fff;cursor:pointer;transition:0.2s}
+#pagination button:disabled{opacity:0.5;cursor:not-allowed}
+#pagination button:hover:not(:disabled){background:#4f46e5;color:#fff;border-color:#4f46e5}
+
+.badge-open {
+  background: rgba(34,197,94,0.15);
+  color: #22c55e;
+}
+
+.badge-expired {
+  background: rgba(239,68,68,0.15);
+  color: #ef4444;
+}
+
+.badge-forever {
+  background: rgba(79,70,229,0.15);
+  color: #6366f1;
+}
+
+.badge-lock {
+  background: rgba(234,179,8,0.15); /* nền vàng nhạt */
+  color: #eab308; /* chữ vàng đậm */
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* ===== Responsive ===== */
+@media(max-width: 768px){
+  .admin-stats {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+  table {
+    min-width: 500px;
+  }
+
+  .login-btn {
+    width: 80%;
+  }
+}
+</style>
+</head>
+
+<body>
 <header>
-  <div class="brand">Smart<span>Link</span> Admin</div>
-  <a href="./index.html" class="btn btn-outline">← Trang chủ</a>
+  <div class="brand">TN<span>Link</span> Admin</div>
+  <div class="badge badge-muted">Tiến Nguyễn Shop</div>
 </header>
 
 <div class="container">
-  <div class="card">
-    <h1>📊 Quản lý link</h1>
-    <div class="sub">Theo dõi & quản lý toàn bộ link rút gọn</div>
 
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Slug</th>
-          <th>URL</th>
-          <th>Clicks</th>
-          <th>Hết hạn</th>
-          <th>Trạng thái</th>
-          <th>Hành động</th>
-        </tr>
-      </thead>
-      <tbody id="linkTable"></tbody>
-    </table>
-
-    <div style="margin-top:20px">
-      <button class="btn danger-btn" id="clearAllBtn">🗑️ Xoá toàn bộ dữ liệu</button>
+  <!-- LOGIN -->
+  <div class="card" id="loginCard">
+    <h2>🔐 Đăng nhập quản trị</h2>
+    <input id="adminKey" placeholder="Nhập Admin Key">
+    <div class="login-actions">
+      <button class="login-btn" id="loginBtn">
+        Đăng Nhập
+        <div class="spinner-btn"></div>
+      </button>
     </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" style="display:none">
+
+    <div class="admin-header">
+      <h1>📊 Quản Lý Link</h1>
+      <div class="top-actions">
+        <button onclick="cleanExpired()">🧹 Xoá hết hạn</button>
+        <button onclick="cleanAll()">🔥 Xoá tất cả</button>
+      </div>
+    </div>
+
+    <div class="admin-stats">
+      <div class="stat-box">
+        <h3 id="totalLinks">0</h3>
+        <span>Tổng link</span>
+      </div>
+      <div class="stat-box">
+        <h3 id="activeLinks">0</h3>
+        <span>Đang mở</span>
+      </div>
+      <div class="stat-box">
+        <h3 id="lockedLinks">0</h3>
+        <span>Đang khoá</span>
+      </div>
+      <div class="stat-box">
+        <h3 id="expiredLinks">0</h3>
+        <span>Hết hạn</span>
+      </div>
+    </div>
+
+    <div class="card table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Slug</th>
+            <th>Link Gốc</th>
+            <th>Hết hạn</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="linkTable"></tbody>
+      </table>
+      <div id="pagination"></div>
+    </div>
+
   </div>
 </div>
 
-<div id="toast" class="toast"></div>
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <script src="./assets/js/admin.js"></script>
