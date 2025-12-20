@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>TNLink — Chuyển hướng an toàn</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./assets/css/main.css">
+</head>
+<body class="center">
+
+<div class="card redirect-card">
+  <div class="brand center-brand">TN<span>Link</span></div>
+
+  <!-- LOADING -->
+  <div id="loadingBox">
+    <div class="spinner"></div>
+    <h2>Đang chuẩn bị chuyển hướng…</h2>
+    <p class="muted">Vui lòng đợi trong giây lát</p>
+  </div>
+  <!-- INFO -->
+  <div id="infoBox" style="display:none">
+    <h2 id="linkTitle"></h2>
+    <p id="linkDesc" class="muted"></p>
+    <div class="countdown">⏳ Tự động chuyển sau <b id="count">5</b> giây</div>
+    <p>Thời hạn sử dụng còn lại: <span id="countdown">Đang tính...</span></p>
+    <button class="btn btn-primary" id="goNow">🚀 Truy cập ngay</button>
+  </div>
+  <!-- PASSWORD -->
+  <div id="lockBox" style="display:none">
+    <h2>🔒 Link được bảo vệ</h2>
+    <p class="muted">Vui lòng nhập mật khẩu để tiếp tục</p>
+    <input id="passwordInput" type="password" placeholder="Mật khẩu">
+    <button class="btn btn-primary" id="unlockBtn">Mở khoá</button>
+    <p class="error" id="lockError"></p>
+  </div>
+  <!-- ERROR -->
+  <div id="errorBox" style="display:none">
+    <h2>⚠️ Không thể truy cập</h2>
+    <p id="errorMsg" class="muted"></p>
+    <a href="/" id="visitBtn" class="btn btn-outline">← Trang chủ</a>
+  </div>
+  
+  <div class="redirect-footer">© 2025 SmartLink • Tiến Nguyễn Shop</div>
+</div>
+
+<script src="./assets/js/redirect.js"></script>
+</body>
+</html>
