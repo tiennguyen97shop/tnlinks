@@ -1,12 +1,15 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycby84cmQIndmZpV6WIQrU6Gf1OlHujkJbskazkHETy9piDK8bilci1wANQ5Ecel3WSlx7w/exec';
 
+/* ================= EXPIRE TEXT ================= */
 function calcExpireText(value){
-  if(!value) return 'Vĩnh viễn';
-  const d = new Date(value) - new Date();
-  if(d<=0) return 'Đã hết hạn';
-  return `Sau ${Math.ceil(d/86400000)} ngày`;
+  if(!value){
+    document.getElementById('expireText').innerText = 'Vĩnh viễn';
+    return;
+  }
+  startExpireCountdown(value, 'expireText', 'expireDate');
 }
 
+/* ================= ELEMENTS ================= */
 const forever = document.getElementById('forever');
 const expireAt = document.getElementById('expireAt');
 const lockToggle = document.getElementById('lockToggle');
@@ -14,158 +17,122 @@ const passwordWrap = document.getElementById('passwordWrap');
 const preview = document.getElementById('preview');
 const error = document.getElementById('error');
 
-/*forever.onchange = ()=>{
+/* ================= EVENTS ================= */
+forever.onchange = () => {
   expireAt.disabled = forever.checked;
   document.getElementById('expireText').innerText =
-    forever.checked ? 'Vĩnh viễn' : calcExpireText(expireAt.value);
-};*/
-
-// KHỞI TẠO TRẠNG THÁI BAN ĐẦU
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('expireText').innerText = 'Đang cập nhật dữ liệu';
-});
-forever.onchange = ()=>{
-  expireAt.disabled = forever.checked;
-
-  document.getElementById('expireText').innerText =
-    forever.checked
-      ? 'Vĩnh viễn'
-      : (expireAt.value ? calcExpireText(expireAt.value) : 'Đang cập nhật dữ liệu');
+    forever.checked ? 'Vĩnh viễn' : 'Đang cập nhật dữ liệu…';
 };
 
-lockToggle.onchange = ()=>{
+lockToggle.onchange = () => {
   passwordWrap.style.display = lockToggle.checked ? 'block' : 'none';
 };
 
-expireAt.onchange = ()=>{
-  document.getElementById('expireText').innerText = calcExpireText(expireAt.value);
+expireAt.onchange = () => {
+  calcExpireText(expireAt.value);
 };
 
-document.getElementById('create').onclick = async ()=>{
+/* ================= CREATE LINK ================= */
+document.getElementById('create').onclick = async () => {
   const data = {
-    action:'create',
-    url:url.value.trim(),
-    slug:slug.value.trim(),
-    title:title.value.trim(),
-    description:description.value.trim(),
+    action: 'create',
+    url: url.value.trim(),
+    slug: slug.value.trim(),
+    title: title.value.trim(),
+    description: description.value.trim(),
     expire_at: forever.checked ? '' : expireAt.value,
     is_locked: lockToggle.checked ? 'TRUE' : 'FALSE',
     password: lockToggle.checked ? password.value : '',
-    max_clicks:''
+    max_clicks: ''
   };
 
-  if(!data.url || !data.slug){
-    //error.innerText='Vui lòng nhập link gốc và slug';
-    showToast('⚠️ Vui lòng nhập slug trước khi tạo link', 'warning');
+  if (!data.url || !data.slug) {
+    showToast('⚠️ Vui lòng nhập đầy đủ URL và Slug', 'warning');
     return;
   }
 
-  error.innerText='';
-  cardLoading.style.display='flex';
-  // 🔥 HIỆN LOADING
-  
-  const qs = new URLSearchParams(data).toString();
+  if (lockToggle.checked && !data.password) {
+    showToast('⚠️ Đã bật khoá nhưng chưa nhập mật khẩu', 'warning');
+    return;
+  }
 
-  try{
-    const res = await fetch(`${API_URL}?${qs}`);
+  showLoading(true);
+
+  try {
+    const res = await fetch(API_URL + '?' + new URLSearchParams(data));
     const json = await res.json();
-    cardLoading.style.display = 'none';
-    // 🔥 TẮT LOADING (THÀNH CÔNG HAY THẤT BẠI ĐỀU TẮT)
-    showToast('✅ Tạo link rút gọn thành công!', 'success');
-    
-    if(!json.success){
-      //error.innerText = json.message || 'Có lỗi';
-      showToast(json.message || 'Có lỗi xảy ra', 'error');
+    showLoading(false);
+
+    if (!json.success) {
+      showToast(json.message || 'Tạo link thất bại', 'error');
       return;
     }
 
-    /* ====== UI SAU KHI TẠO THÀNH CÔNG ====== */
-
     const shortLink = `${location.origin}/go/${data.slug}`;
-
-    // HIỆN CARD KẾT QUẢ
-    const resultCard = document.getElementById('resultCard');
-    resultCard.style.display = 'block';
-
+    document.getElementById('resultCard').style.display = 'block';
     document.getElementById('resultLink').value = shortLink;
-
-    // ẨN SIDE PANEL
+    document.getElementById('visitBtn').href = shortLink;
     document.getElementById('sidePanel').style.display = 'none';
 
-    // GÁN LINK TRUY CẬP
-    document.getElementById('visitBtn').href = shortLink;
-    
-    //preview.style.display='block';
-    //preview.innerHTML = `<strong>Link đã tạo:</strong><br>${location.origin}/r/${data.slug}`;
-    
-  }catch{
-    // 🔥 TẮT LOADING KHI LỖI
-    cardLoading.style.display = 'none';
-    showToast(json.message || ' Không thể kết nối tới máy chủ của Tiến Nguyễn Shop', 'error');
-    //error.innerText='Không thể kết nối máy chủ';
+    showToast('✅ Tạo link rút gọn thành công!', 'success');
+
+  } catch (e) {
+    showLoading(false);
+    showToast('❌ Không thể kết nối máy chủ', 'error');
   }
 };
 
-document.getElementById('newLinkBtn').addEventListener('click', () => {
-
-  // ẨN CARD KẾT QUẢ
+/* ================= NEW LINK ================= */
+document.getElementById('newLinkBtn').onclick = () => {
   document.getElementById('resultCard').style.display = 'none';
-
-  // HIỆN SIDE PANEL
   document.getElementById('sidePanel').style.display = 'block';
 
-  // RESET FORM
-  document.getElementById('url').value = '';
-  document.getElementById('slugSource').value = '';
-  document.getElementById('slug').value = '';
-  document.getElementById('title').value = '';
-  document.getElementById('description').value = '';
-  document.getElementById('expireAt').value = '';
-  document.getElementById('forever').checked = false;
-  document.getElementById('lockToggle').checked = false;
-  document.getElementById('password').value = '';
-  document.getElementById('passwordWrap').style.display = 'none';
+  ['url','slugSource','slug','title','description','password'].forEach(id=>{
+    document.getElementById(id).value = '';
+  });
 
-  // RESET TEXT
+  expireAt.value = '';
+  forever.checked = false;
+  lockToggle.checked = false;
+  passwordWrap.style.display = 'none';
   document.getElementById('expireText').innerText = 'Vĩnh viễn';
-  document.getElementById('error').innerText = '';
-  document.getElementById('preview').style.display = 'none';
- 
- showToast('🔁 Sẵn sàng tạo link mới', 'info');
- 
-});
 
+  showToast('🔁 Sẵn sàng tạo link mới', 'info');
+};
+
+/* ================= COPY ================= */
+document.getElementById('copyBtn').onclick = () => {
+  navigator.clipboard.writeText(document.getElementById('resultLink').value);
+  showToast('✅ Đã sao chép link!', 'success');
+};
+
+/* ================= SLUG AUTO ================= */
 function slugify(text) {
   return text
     .toLowerCase()
-    .normalize('NFD')                     // tách dấu
-    .replace(/[\u0300-\u036f]/g, '')      // xoá dấu
-    .replace(/[^a-z0-9\s-]/g, '')         // xoá ký tự đặc biệt
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
     .trim()
-    .replace(/\s+/g, '-')                 // space -> -
-    .replace(/-+/g, '-');                 // -- -> -
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
 }
 
 const slugSourceInput = document.getElementById('slugSource');
 const slugInput = document.getElementById('slug');
-
 let slugManuallyEdited = false;
 
-// Nếu user sửa slug → ngừng auto
-slugInput.addEventListener('input', () => {
-  slugManuallyEdited = true;
-});
+slugInput.addEventListener('input', () => slugManuallyEdited = true);
 
-// Khi nhập văn bản → tự sinh slug
 slugSourceInput.addEventListener('input', () => {
   if (!slugManuallyEdited) {
     slugInput.value = slugify(slugSourceInput.value);
   }
 });
 
+/* ================= TOAST ================= */
 function showToast(text, type = 'info') {
-  let bg = '#4f46e5'; // default
-
+  let bg = '#4f46e5';
   if (type === 'success') bg = '#22c55e';
   if (type === 'error') bg = '#ef4444';
   if (type === 'warning') bg = '#f59e0b';
@@ -177,19 +144,27 @@ function showToast(text, type = 'info') {
     position: "right",
     close: true,
     backgroundColor: bg,
-    stopOnFocus: true,
+    stopOnFocus: true
   }).showToast();
 }
 
+/* ================= SOCIAL TOGGLE ================= */
 const socialToggle = document.getElementById('socialToggle');
 const socialDropdown = document.getElementById('socialDropdown');
 
 if (socialToggle && socialDropdown) {
   socialToggle.onclick = () => {
-    const isOpen = socialDropdown.style.display === 'flex';
+    const open = socialDropdown.style.display === 'flex';
+    socialDropdown.style.display = open ? 'none' : 'flex';
 
-    socialDropdown.style.display = isOpen ? 'none' : 'flex';
-    socialToggle.querySelector('.arrow').style.transform =
-      isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+    const arrow = socialToggle.querySelector('.arrow');
+    if (arrow) arrow.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
   };
+}
+
+
+function showLoading(show){
+  const loading = document.getElementById('cardLoading');
+  if(!loading) return;
+  loading.style.display = show ? 'flex' : 'none';
 }
