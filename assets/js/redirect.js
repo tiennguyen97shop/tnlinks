@@ -1,45 +1,47 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycby84cmQIndmZpV6WIQrU6Gf1OlHujkJbskazkHETy9piDK8bilci1wANQ5Ecel3WSlx7w/exec';
 
-// Lấy slug từ cuối URL
-// Ví dụ: https://tiennguyen.github.io/tnlinks/go/abc123
-const pathParts = location.pathname.split('/').filter(Boolean);
-const goIndex = pathParts.indexOf('go'); // tìm vị trí 'go'
-const slug = goIndex >= 0 && goIndex < pathParts.length-1 ? pathParts[goIndex+1] : '';
+// Lấy slug từ query string thay vì pathname
+const params = new URLSearchParams(location.search);
+const slug = params.get('dithoi'); // vd: go.html?slug=abc123
 
 const loadingBox = document.getElementById('loadingBox');
 const infoBox    = document.getElementById('infoBox');
 const lockBox    = document.getElementById('lockBox');
 const errorBox   = document.getElementById('errorBox');
 
-fetch(`${API_URL}?action=get&slug=${slug}`)
-  .then(r=>r.json())
-  .then(res=>{
-    loadingBox.style.display='none';
+if (!slug) {
+  showError('Slug không hợp lệ');
+} else {
+  fetch(`${API_URL}?action=get&slug=${slug}`)
+    .then(r => r.json())
+    .then(res => {
+      loadingBox.style.display = 'none';
 
-    if(res.error){
-      showError(mapError(res.error));
-      return;
-    }
+      if (res.error) {
+        showError(mapError(res.error));
+        return;
+      }
 
-    // HIỂN THỊ THÔNG TIN
-    document.getElementById('linkTitle').innerText = res.title || 'SmartLink Redirect';
-    document.getElementById('linkDesc').innerText  = res.description || 'Bạn sẽ được chuyển hướng an toàn';
+      // HIỂN THỊ THÔNG TIN
+      document.getElementById('linkTitle').innerText = res.title || 'SmartLink Redirect';
+      document.getElementById('linkDesc').innerText  = res.description || 'Bạn sẽ được chuyển hướng an toàn';
 
-    // LINK KHOÁ
-    if(res.is_locked==='TRUE'){
-      lockBox.style.display='block';
-      handleUnlock(res);
-      return;
-    }
+      // LINK KHOÁ
+      if (res.is_locked === 'TRUE') {
+        lockBox.style.display = 'block';
+        handleUnlock(res);
+        return;
+      }
 
-    // LINK THƯỜNG
-    infoBox.style.display='block';
-    startRedirect(res.url, slug);
-  })
-  .catch(()=>{
-    loadingBox.style.display='none';
-    showError('Không thể kết nối máy chủ');
-  });
+      // LINK THƯỜNG
+      infoBox.style.display = 'block';
+      startRedirect(res.url, slug);
+    })
+    .catch(() => {
+      loadingBox.style.display = 'none';
+      showError('Không thể kết nối máy chủ');
+    });
+}
 
 function startRedirect(url, slug){
   let sec = 5;
@@ -54,16 +56,16 @@ function startRedirect(url, slug){
     }
   },1000);
 
-  document.getElementById('goNow').onclick=()=>{
+  document.getElementById('goNow').onclick = () => {
     clearInterval(timer);
     hitAndGo(url, slug);
   };
 }
 
 function handleUnlock(res){
-  document.getElementById('unlockBtn').onclick=()=>{
+  document.getElementById('unlockBtn').onclick = () => {
     const val = document.getElementById('passwordInput').value;
-    if(val!==res.password){
+    if(val !== res.password){
       document.getElementById('lockError').innerText='Mật khẩu không đúng';
       return;
     }
