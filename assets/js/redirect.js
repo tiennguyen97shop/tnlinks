@@ -27,11 +27,21 @@ if (!slug) {
       document.getElementById('linkDesc').innerText  = res.description || 'Bạn sẽ được chuyển hướng an toàn';
 
       // LINK KHOÁ
-      if (res.is_locked === 'TRUE') {
+      /*if (res.is_locked === 'TRUE') {
         lockBox.style.display = 'block';
         handleUnlock(res);
         return;
+      }*/
+      
+      // Thay thế đoạn: if (res.is_locked === 'TRUE') {
+    // Bằng đoạn dưới đây:
+      const lockedStatus = String(res.is_locked).toUpperCase();
+      if (lockedStatus === 'TRUE') {
+           lockBox.style.display = 'block';
+           handleUnlock(res);
+           return;
       }
+
 
       // LINK THƯỜNG
       infoBox.style.display = 'block';
