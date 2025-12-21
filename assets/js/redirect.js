@@ -32,15 +32,15 @@ if (!slug) {
         handleUnlock(res);
         return;
       }*/
-      
-      // Thay thế đoạn: if (res.is_locked === 'TRUE') {
-    // Bằng đoạn dưới đây:
-      const lockedStatus = String(res.is_locked).toUpperCase();
-      if (lockedStatus === 'TRUE') {
-           lockBox.style.display = 'block';
-           handleUnlock(res);
-           return;
-      }
+
+// Kiểm tra khóa: chấp nhận cả kiểu Boolean true và chuỗi "TRUE"/"true"
+const isLocked = res.is_locked === true || String(res.is_locked).toUpperCase() === 'TRUE';
+
+if (isLocked) {
+  lockBox.style.display = 'block';
+  handleUnlock(res);
+  return; // Dừng lại để chờ nhập mật khẩu
+}
 
 
       // LINK THƯỜNG
