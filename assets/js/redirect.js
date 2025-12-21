@@ -34,15 +34,14 @@ if (!slug) {
 
       // 3. XỬ LÝ KHÓA MẬT KHẨU
       // Lấy mật khẩu từ server, ép về kiểu chuỗi và xóa khoảng trắng
-      const passwordFromServer = res.password ? String(res.password).trim() : '';
-      
+      //const passwordFromServer = res.password ? String(res.password).trim() : '';
+      const passwordFromServer = res.password != null ? String(res.password) : '';
       // Điều kiện hiện màn hình khóa: is_locked là TRUE HOẶC có mật khẩu trong ô F
-      if (passwordFromServer !== '') {
+      if (passwordFromServer.trim() !== '') {
         lockBox.style.display = 'block';
         handleUnlockLogic(passwordFromServer, res.url, slug);
         return; // QUAN TRỌNG: Dừng lại tại đây để chờ nhập pass
-      }
-
+      } else {
       // 4. TRƯỜNG HỢP KHÔNG CÓ KHÓA
       showRedirectInfo(res.url, slug, res.expire_at);
     })
