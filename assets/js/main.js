@@ -34,7 +34,7 @@ expireAt.onchange = () => {
 
 /* ================= CREATE LINK ================= */
 document.getElementById('create').onclick = async () => {
-  const data = {
+  /*const data = {
     action: 'create',
     url: url.value.trim(),
     slug: slug.value.trim(),
@@ -44,7 +44,20 @@ document.getElementById('create').onclick = async () => {
     is_locked: lockToggle.checked ? 'TRUE' : 'FALSE',
     password: lockToggle.checked ? password.value : '',
     max_clicks: ''
-  };
+  };*/
+  /* Tìm và thay thế đoạn tạo biến data bằng đoạn này */
+const data = {
+  action: 'create',
+  url: document.getElementById('url').value.trim(),         // Đảm bảo lấy đúng từ ô Link gốc
+  slug: document.getElementById('slug').value.trim(),       // Lấy từ ô Slug
+  title: document.getElementById('title').value.trim(),     // Lấy từ ô Tiêu đề
+  description: document.getElementById('description').value.trim(),
+  expire_at: document.getElementById('forever').checked ? '' : document.getElementById('expireAt').value,
+  is_locked: document.getElementById('lockToggle').checked ? 'TRUE' : 'FALSE',
+  password: document.getElementById('lockToggle').checked ? document.getElementById('password').value : '',
+  max_clicks: ''
+};
+
 
   if (!data.url || !data.slug) {
     showToast('⚠️ Vui lòng nhập đầy đủ URL và Slug', 'warning');
