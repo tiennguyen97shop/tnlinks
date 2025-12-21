@@ -1,6 +1,11 @@
+/**
+ * TNLink Redirect System - 2025
+ * Fix: Lỗi bỏ qua password & lỗi so sánh kiểu dữ liệu (Boolean/String/Number)
+ */
+
 const API_URL = 'https://script.google.com/macros/s/AKfycby84cmQIndmZpV6WIQrU6Gf1OlHujkJbskazkHETy9piDK8bilci1wANQ5Ecel3WSlx7w/exec';
 
-// 1. Lấy slug từ query string (dithoi=...)
+// 1. Lấy slug từ query string (?dithoi=...)
 const params = new URLSearchParams(location.search);
 const slug = params.get('dithoi'); 
 
@@ -12,7 +17,7 @@ const errorBox   = document.getElementById('errorBox');
 if (!slug) {
   showError('Slug không hợp lệ');
 } else {
-  // 2. Gọi API lấy thông tin link
+  // 2. Lấy thông tin link từ Apps Script
   fetch(`${API_URL}?action=get&slug=${slug}`)
     .then(r => r.json())
     .then(res => {
@@ -23,22 +28,26 @@ if (!slug) {
         return;
       }
 
-      // HIỂN THỊ THÔNG TIN CƠ BẢN
+      // Cập nhật thông tin giao diện
       document.getElementById('linkTitle').innerText = res.title || 'TNLink Redirect';
-      document.getElementById('linkDesc').innerText  = res.description || 'Vui lòng đợi trong giây lát...';
+      document.getElementById('linkDesc').innerText  = res.description || 'Vui lòng chờ giây lát...';
 
-      // 3. KIỂM TRA TRẠNG THÁI KHOÁ (FIX LỖI BOOLEAN/STRING)
-      // Chấp nhận cả giá trị logic true từ Sheets và chuỗi "TRUE" gửi từ form
-      const isLocked = res.is_locked === true || String(res.is_locked).toUpperCase() === 'TRUE';
+      // 3. XỬ LÝ KHÓA MẬT KHẨU
+      // Lấy mật khẩu từ server, ép về kiểu chuỗi và xóa khoảng trắng
+      const passwordFromServer = res.password ? String(res.password).trim() : '';
+      
+      // Kiểm tra trạng thái is_locked từ Sheets (chấp nhận cả true hoặc "TRUE")
+      const isLockedStatus = res.is_locked === true || String(res.is_locked).toUpperCase() === 'TRUE';
 
-      if (isLocked) {
+      // Điều kiện hiện màn hình khóa: is_locked là TRUE HOẶC có mật khẩu trong ô F
+      if (isLockedStatus || passwordFromServer !== '') {
         lockBox.style.display = 'block';
-        handleUnlock(res); // Truyền dữ liệu sang hàm xử lý mật khẩu
-        return; 
+        handleUnlockLogic(passwordFromServer, res.url, slug);
+        return; // QUAN TRỌNG: Dừng lại tại đây để chờ nhập pass
       }
 
-      // 4. LINK THƯỜNG (KHÔNG KHOÁ)
-      showInfoAndRedirect(res);
+      // 4. TRƯỜNG HỢP KHÔNG CÓ KHÓA
+      showRedirectInfo(res.url, slug, res.expire_at);
     })
     .catch(() => {
       loadingBox.style.display = 'none';
@@ -46,98 +55,104 @@ if (!slug) {
     });
 }
 
-// HÀM XỬ LÝ MỞ KHOÁ (FIX LỖI SO SÁNH MẬT KHẨU SỐ)
-function handleUnlock(res){
+/**
+ * Xử lý logic nhập mật khẩu
+ */
+function handleUnlockLogic(correctPassword, targetUrl, slug) {
   const unlockBtn = document.getElementById('unlockBtn');
   const passInput = document.getElementById('passwordInput');
   const lockError = document.getElementById('lockError');
 
   unlockBtn.onclick = () => {
-    const val = passInput.value.trim();
+    const userInput = passInput.value.trim();
     
-    // Ép cả 2 về String để "123456" khớp với 123456 trong trang tính
-    if(String(val) !== String(res.password)){
+    // So sánh chuỗi để khớp với cả mật khẩu là số (ví dụ: 123456)
+    if (String(userInput) !== String(correctPassword)) {
       lockError.innerText = '❌ Mật khẩu không chính xác';
+      passInput.focus();
       return;
     }
     
-    // Đúng mật khẩu
+    // Mật khẩu đúng
     lockBox.style.display = 'none';
-    showInfoAndRedirect(res);
+    showRedirectInfo(targetUrl, slug);
   };
 
-  // Hỗ trợ nhấn phím Enter để mở khoá
+  // Cho phép nhấn phím Enter để mở khóa
   passInput.onkeypress = (e) => {
-    if(e.key === 'Enter') unlockBtn.click();
+    if (e.key === 'Enter') unlockBtn.click();
   };
 }
 
-// HÀM HIỂN THỊ VÀ BẮT ĐẦU ĐẾM NGƯỢC
-function showInfoAndRedirect(res) {
+/**
+ * Hiển thị đếm ngược và chuyển hướng
+ */
+function showRedirectInfo(url, slug, expireAt) {
   infoBox.style.display = 'block';
   
-  // Khởi chạy đếm ngược thời hạn link
-  if(res.expire_at) {
-    startRedirectCountdown(res.expire_at);
+  // Hiển thị thời gian hết hạn (nếu có)
+  const countdownText = document.getElementById('countdown');
+  if (expireAt) {
+    startCountdownTimer(expireAt, countdownText);
   } else {
-    document.getElementById('countdown').innerText = 'Vĩnh viễn';
+    countdownText.innerText = 'Vĩnh viễn';
   }
 
-  startRedirect(res.url, res.slug);
+  startAutoRedirect(url, slug);
 }
 
-function startRedirect(url, slug){
+function startAutoRedirect(url, slug) {
   let sec = 5;
   const countEl = document.getElementById('count');
   countEl.innerText = sec;
 
-  const timer = setInterval(()=>{
+  const timer = setInterval(() => {
     sec--;
     countEl.innerText = sec;
-    if(sec <= 0){
+    if (sec <= 0) {
       clearInterval(timer);
-      hitAndGo(url, slug);
+      performHitAndGo(url, slug);
     }
   }, 1000);
 
   document.getElementById('goNow').onclick = () => {
     clearInterval(timer);
-    hitAndGo(url, slug);
+    performHitAndGo(url, slug);
   };
 }
 
-function hitAndGo(url, slug){
-  // Ghi nhận lượt click vào Trang tính
+function performHitAndGo(url, slug) {
+  // Gửi tín hiệu click về server
   fetch(`${API_URL}?action=click&slug=${slug}`);
   location.href = url;
 }
 
-function showError(msg){
+function showError(msg) {
   errorBox.style.display = 'block';
   document.getElementById('errorMsg').innerText = msg;
 }
 
-function mapError(code){
-  return {
-    not_found: 'Link này không tồn tại trên hệ thống',
-    expired: 'Link này đã hết hạn sử dụng',
-    disabled: 'Link đã bị tạm dừng hoặc quá lượt truy cập'
-  }[code] || 'Lỗi truy cập hệ thống';
+function mapError(code) {
+  const errors = {
+    'not_found': 'Link không tồn tại',
+    'expired': 'Link này đã hết hạn',
+    'disabled': 'Link đã bị vô hiệu hóa'
+  };
+  return errors[code] || 'Không thể truy cập link';
 }
 
-function startRedirectCountdown(expireAt) {
-  const countdownEl = document.getElementById('countdown');
+function startCountdownTimer(expireAt, element) {
   const interval = setInterval(() => {
     const diff = new Date(expireAt) - new Date();
     if (diff <= 0) {
       clearInterval(interval);
-      countdownEl.innerText = 'Hết hạn';
+      element.innerText = 'Đã hết hạn';
       return;
     }
-    const days = Math.floor(diff / (1000*60*60*24));
-    const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
-    const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
-    const secs = Math.floor((diff % (1000*60)) / 1000);
-    countdownEl.innerText = `${days} ngày ${hours}:${mins}:${secs}`;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const secs = Math.floor((diff % (1000 * 60)) / 1000);
+    element.innerText = `${days}d ${hours}:${mins}:${secs}`;
   }, 1000);
 }
