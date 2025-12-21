@@ -36,11 +36,8 @@ if (!slug) {
       // Lấy mật khẩu từ server, ép về kiểu chuỗi và xóa khoảng trắng
       const passwordFromServer = res.password ? String(res.password).trim() : '';
       
-      // Kiểm tra trạng thái is_locked từ Sheets (chấp nhận cả true hoặc "TRUE")
-      const isLockedStatus = res.is_locked === true || String(res.is_locked).toUpperCase() === 'TRUE';
-
       // Điều kiện hiện màn hình khóa: is_locked là TRUE HOẶC có mật khẩu trong ô F
-      if (isLockedStatus || passwordFromServer !== '') {
+      if (passwordFromServer !== '') {
         lockBox.style.display = 'block';
         handleUnlockLogic(passwordFromServer, res.url, slug);
         return; // QUAN TRỌNG: Dừng lại tại đây để chờ nhập pass
